@@ -28,13 +28,14 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           return; 
         }
 
-        if (message.content.toLowerCase() === "selam" || message.content.toUpperCase() === "selam" || message.content === "Selam") {
-            return message.reply("Aleyküm Selam")
-        }
-
         const author = message.author;
         const messageContent = message.content;
         const messageTime = message.createdAt.toLocaleString(); 
+
+        if (message.content.toLowerCase() === "selam" || message.content.toUpperCase() === "selam" || message.content === "Selam") {
+            return message.reply(`Aleyküm Selam ${author}`)
+        }
+        
         const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}\nMessage Time: ${messageTime}\nMessage Content: ${messageContent}`;
         
         message.channel.send(userInfo);
