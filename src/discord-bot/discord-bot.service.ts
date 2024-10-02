@@ -24,19 +24,21 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       console.log(`Bot ${this.client.user.tag} başarıyla giriş yaptı!`);
 
       this.client.on('messageCreate', (message) => {
-        
         if (message.author.id === this.client.user.id) {
-            return; 
-          }
-  
-          
-          const author = message.author;
-          const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}`;
-          
-          message.channel.send(userInfo);
-        });
-      
+          return; 
+        }
 
+        if (message.content.toLowerCase() === "selam" || message.content.toUpperCase() === "selam" || message.content === "Selam") {
+            return message.reply("Aleyküm Selam")
+        }
+
+        const author = message.author;
+        const messageTime = message.createdAt.toLocaleString(); 
+        const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}\nMessage Time: ${messageTime}`;
+        
+        message.channel.send(userInfo);
+      });
+      
     } catch (error) {
       console.error('Error', error);
     }
