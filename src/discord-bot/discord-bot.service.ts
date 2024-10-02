@@ -21,13 +21,21 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN;
 
       await this.client.login(DISCORD_BOT_TOKEN);
-      console.log(`Bot ${this.client.user.tag} logged in successfully!`);
+      console.log(`Bot ${this.client.user.tag} başarıyla giriş yaptı!`);
 
       this.client.on('messageCreate', (message) => {
-        if (message.content === '!deneme') {
-          message.channel.send('Response to deneme!');
-        }
-      });
+        
+        if (message.author.id === this.client.user.id) {
+            return; 
+          }
+  
+          
+          const author = message.author;
+          const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}`;
+          
+          message.channel.send(userInfo);
+        });
+      
 
     } catch (error) {
       console.error('Error', error);
@@ -36,6 +44,6 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy() {
     await this.client.destroy();
-    console.log('Bot has been disconnected!');
+    console.log('Bot bağlantısı kesildi!');
   }
 }
