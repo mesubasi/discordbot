@@ -9,7 +9,7 @@ import { Message } from './discord-bot/discord-bot.entity';
     type: "postgres",
     host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
-      username: String("postgres"),
+      username: "mesdev",
       password: String(process.env.DB_PASSWORD),
       database: process.env.DB_DATABASE,
       entities: [Message],
