@@ -33,8 +33,9 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         }
 
         const author = message.author;
+        const messageContent = message.content;
         const messageTime = message.createdAt.toLocaleString(); 
-        const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}\nMessage Time: ${messageTime}`;
+        const userInfo = `User Info:\nUsername: ${author.username}\nID: ${author.id}\nAvatar: ${author.displayAvatarURL()}\nMessage Time: ${messageTime}\nMessage Content: ${messageContent}`;
         
         message.channel.send(userInfo);
       });
