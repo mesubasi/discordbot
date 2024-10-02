@@ -48,7 +48,6 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
        
         const newMessage = this.messageRepository.create({
           username: message.author.username,
-          userId: message.author.id,
           content: message.content,
           createdAt: new Date(), 
         });
