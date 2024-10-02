@@ -52,6 +52,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           createdAt: new Date(), 
         });
 
+
         await this.messageRepository.save(newMessage);
 
         const userInfo = `User Info:\nUsername: ${message.author.username}\nID: ${message.author.id}\nAvatar: ${message.author.displayAvatarURL()}\nMessage Time: ${message.createdAt.toLocaleString()}\nMessage Content: ${message.content}`;

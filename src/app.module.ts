@@ -5,16 +5,18 @@ import { Message } from './discord-bot/discord-bot.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
-    type: "postgres",
-    host: process.env.DB_HOST,
+  imports: [
+    TypeOrmModule.forRoot({
+      type: "postgres",
+      host: process.env.DB_HOST,
       port: +process.env.DB_PORT,
-      username: "mesdev",
+      username: "postgres",
       password: String(process.env.DB_PASSWORD),
       database: process.env.DB_DATABASE,
       entities: [Message],
       synchronize: true, 
     }),
-    TypeOrmModule.forFeature([Message])],
+    TypeOrmModule.forFeature([Message]),
+  ],
 })
 export class AppModule {}
