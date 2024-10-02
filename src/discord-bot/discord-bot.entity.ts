@@ -9,9 +9,6 @@ export class Message {
   username: string;
 
   @Column()
-  userId: string;
-
-  @Column()
   content: string;
 
   @Column({ type: 'timestamptz' })
