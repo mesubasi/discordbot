@@ -1,12 +1,9 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Client, GatewayIntentBits } from 'discord.js';
-import * as dotenv from 'dotenv';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Message } from './discord-bot.entity'; // 
-
-dotenv.config();
-
+import { Message } from './discord-bot.entity'; 
+import ollama from 'ollama'
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
@@ -45,6 +42,14 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           return message.reply(`Aleyküm Selam ${message.author}`);
         }
 
+        if (message.content === "/start") {
+          const response = await ollama.chat({
+            model: 'llama3.2',
+            messages: [{ role: 'user', content: message.content }],
+          })
+          console.log(response.message.content)
+        } 
+
        
         const newMessage = this.messageRepository.create({
           username: message.author.username,
@@ -55,8 +60,8 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
 
         await this.messageRepository.save(newMessage);
 
-        const userInfo = `User Info:\nUsername: ${message.author.username}\nID: ${message.author.id}\nAvatar: ${message.author.displayAvatarURL()}\nMessage Time: ${message.createdAt.toLocaleString()}\nMessage Content: ${message.content}`;
-        message.channel.send(userInfo);
+        // const userInfo = `User Info:\nUsername: ${message.author.username}\nID: ${message.author.id}\nAvatar: ${message.author.displayAvatarURL()}\nMessage Time: ${message.createdAt.toLocaleString()}\nMessage Content: ${message.content}`;
+        // message.channel.send(userInfo);
       });
     } catch (error) {
       console.error('Error', error);
