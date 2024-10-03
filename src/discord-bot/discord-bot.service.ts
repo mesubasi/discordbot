@@ -42,14 +42,14 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           return message.reply(`Aleyküm Selam ${message.author}`);
         }
 
-        if (message.content === "/start") {
+        if (message.content === "/baslat") {
           const response = await ollama.chat({
             model: 'llama3.2',
             messages: [{ role: 'user', content: message.content }],
           })
           message.channel.send(response.message.content)
         } 
-
+        
        
         const newMessage = this.messageRepository.create({
           username: message.author.username,
