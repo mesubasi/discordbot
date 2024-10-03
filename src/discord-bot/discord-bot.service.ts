@@ -9,6 +9,7 @@ import ollama from 'ollama';
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
+  private isActive: boolean = false;
 
   constructor(
     @InjectRepository(Message)
@@ -72,9 +73,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         }
 
         if (
-          message.content.toLowerCase() === 'selam' || 
-          message.content.toUpperCase() === 'selam' || 
-          message.content === 'Selam'
+          message.content.toLowerCase() === 'selam'
         ) {
           return message.reply(`Aleyküm Selam ${message.author}`);
         }
