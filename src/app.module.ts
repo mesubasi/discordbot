@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DiscordBotService } from './discord-bot/discord-bot.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './discord-bot/discord-bot.entity';
@@ -8,6 +9,15 @@ dotenv.config()
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot({
+      wildcard: false,
+      delimiter: '.',
+      newListener: false,
+      removeListener: false,
+      maxListeners: 10,
+      verboseMemoryLeak: false,
+      ignoreErrors: false,
+    }),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: process.env.DB_HOST,
