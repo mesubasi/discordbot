@@ -41,6 +41,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.application.commands.create(baslat);
       await this.client.application.commands.create(durdur);
 
+      this.client.on('messageCreate', async (message) => {
       this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
 
@@ -74,7 +75,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         }
       });
 
-      this.client.on('messageCreate', async (message) => {
+     
         if (message.author.id === this.client.user.id) {
           return;
         }
@@ -85,7 +86,8 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
 
         const newMessage = this.messageRepository.create({
           username: message.author.username,
-          content: message.content,
+          usercontent: message.content,
+          aicontent: "response.message.content",
           createdAt: new Date(),
         });
 

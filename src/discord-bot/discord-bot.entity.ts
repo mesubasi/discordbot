@@ -9,8 +9,8 @@ export class Message {
   username: string;
 
   @Column()
-  content: string;
-  
+  usercontent: string;
+
   @Column()
   aicontent: string;
 
