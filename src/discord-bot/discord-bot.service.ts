@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './discord-bot.entity'; 
 import ollama from 'ollama';
+import { EventEmitter } from 'events';
 
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
