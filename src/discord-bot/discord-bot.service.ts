@@ -41,6 +41,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.application.commands.create(baslat);
       await this.client.application.commands.create(durdur);
 
+
       this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
         if (interaction.commandName === "baslat") {
@@ -70,7 +71,8 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         }
 
         if (
-          message.content.toLowerCase() === 'selam' ||
+          message.content.toLowerCase() === 'selam' || 
+          message.content.toUpperCase() === 'selam' || 
           message.content === 'Selam'
         ) {
           return message.reply(`Aleyküm Selam ${message.author}`);
