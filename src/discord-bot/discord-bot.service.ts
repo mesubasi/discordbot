@@ -43,6 +43,15 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
 
       this.client.on('messageCreate', async (message) => {
       this.client.on("interactionCreate", async (interaction) => {
+
+        if (message.author.id === this.client.user.id) {
+          return;
+        }
+
+        if (message.content.toLowerCase() === 'selam') {
+          return message.reply(`Aleyküm Selam ${message.author}`);
+        }
+        
         if (!interaction.isChatInputCommand()) return;
 
         if (interaction.commandName === "baslat") {
@@ -73,25 +82,17 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           this.isActive = false; 
             interaction.reply("Sohbet durduruldu.");
         }
-      });
-
-     
-        if (message.author.id === this.client.user.id) {
-          return;
-        }
-
-        if (message.content.toLowerCase() === 'selam') {
-          return message.reply(`Aleyküm Selam ${message.author}`);
-        }
 
         const newMessage = this.messageRepository.create({
           username: message.author.username,
           usercontent: message.content,
-          aicontent: "response.message.content",
+          aicontent: "",
           createdAt: new Date(),
         });
 
         await this.messageRepository.save(newMessage);
+      });
+
       });
 
     } catch (error) {
