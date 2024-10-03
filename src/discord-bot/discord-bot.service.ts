@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Message } from './discord-bot.entity'; 
 import ollama from 'ollama';
 
-
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
@@ -31,39 +30,47 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.login(DISCORD_BOT_TOKEN);
       console.log(`Bot ${this.client.user.tag} başarıyla giriş yaptı!`);
 
-      
       const baslat = new SlashCommandBuilder()
         .setName("baslat")
         .setDescription("Yapay zeka ile sohbet başlatır.");
 
-        const durdur = new SlashCommandBuilder()
+      const durdur = new SlashCommandBuilder()
         .setName("durdur")
-        .setDescription("Yapay zeka ile sohbeti durdurur.")
+        .setDescription("Yapay zeka ile sohbeti durdurur.");
 
       await this.client.application.commands.create(baslat);
       await this.client.application.commands.create(durdur);
 
-
       this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
+
         if (interaction.commandName === "baslat") {
-        try {
+          this.isActive = true; 
           await interaction.reply("Sohbet başlatılıyor...");
-          
-          const response = await ollama.chat({
-            model: 'llama3.2',
-            messages: [{ role: 'user',content: "Merhaba! Ben bir yapay zeka destekli sohbet botuyum. Herhangi bir konuda seninle sohbet etmek, sorularını yanıtlamak veya bilgi sağlamak için buradayım. İstediğin konuyu seçebilirsin: genel bilgi, teknoloji, bilim, sanat, günlük yaşam veya başka bir şey. Ne hakkında konuşmak istersin?" }],
-          });
-          await interaction.channel.send(response.message.content);
-        } catch (error) {
-          console.log(error);
-        }        
-        } else if (interaction.commandName === "durdur"){
-          try {
-            await interaction.reply("Sohbet durduruldu.");
-          } catch (error) {
-            console.log(error);
+
+          while (this.isActive) {
+            const filter = (response) => {
+              return response.author.id === interaction.user.id; 
+            };
+
+            const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] });
+            if (!collected) {
+              await interaction.channel.send("30 saniye içinde yanıt alamadım. Sohbeti durduruyorum.");
+              this.isActive = false; 
+              return;
+            }
+
+            const userMessage = collected.first();
+            const response = await ollama.chat({
+              model: 'llama3.2',
+              messages: [{ role: 'user', content: userMessage.content }],
+            });
+
+            await interaction.channel.send(response.message.content);
           }
+        } else if (interaction.commandName === "durdur") {
+          this.isActive = false; 
+            interaction.reply("Sohbet durduruldu.");
         }
       });
 
@@ -72,17 +79,14 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
           return;
         }
 
-        if (
-          message.content.toLowerCase() === 'selam'
-        ) {
+        if (message.content.toLowerCase() === 'selam') {
           return message.reply(`Aleyküm Selam ${message.author}`);
         }
 
-        
         const newMessage = this.messageRepository.create({
           username: message.author.username,
           content: message.content,
-          createdAt: new Date(), 
+          createdAt: new Date(),
         });
 
         await this.messageRepository.save(newMessage);
@@ -92,7 +96,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       console.error('Error', error);
     }
   }
-  
+
   async onModuleDestroy() {
     await this.client.destroy();
     console.log('Bot bağlantısı kesildi!');
