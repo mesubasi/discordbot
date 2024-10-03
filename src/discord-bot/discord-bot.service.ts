@@ -47,7 +47,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
             model: 'llama3.2',
             messages: [{ role: 'user', content: message.content }],
           })
-          console.log(response.message.content)
+          message.channel.send(response.message.content)
         } 
 
        
