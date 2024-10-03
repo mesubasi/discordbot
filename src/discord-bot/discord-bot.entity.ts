@@ -13,4 +13,5 @@ export class Message {
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
+  static channel: any;
 }
