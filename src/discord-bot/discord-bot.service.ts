@@ -9,6 +9,7 @@ import ollama from 'ollama';
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
   private isActive: boolean = false;
+  private aiContent:[String];
 
   constructor(
     @InjectRepository(Message)
@@ -30,16 +31,16 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.login(DISCORD_BOT_TOKEN);
       console.log(`Bot ${this.client.user.tag} başarıyla giriş yaptı!`);
 
-      const baslat = new SlashCommandBuilder()
+      const start = new SlashCommandBuilder()
         .setName("baslat")
         .setDescription("Yapay zeka ile sohbet başlatır.");
 
-      const durdur = new SlashCommandBuilder()
+      const stop = new SlashCommandBuilder()
         .setName("durdur")
         .setDescription("Yapay zeka ile sohbeti durdurur.");
 
-      await this.client.application.commands.create(baslat);
-      await this.client.application.commands.create(durdur);
+      await this.client.application.commands.create(start);
+      await this.client.application.commands.create(stop);
 
       this.client.on('messageCreate', async (message) => {
       this.client.on("interactionCreate", async (interaction) => {
@@ -77,6 +78,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
             });
 
             await interaction.channel.send(response.message.content);
+            const aiContent = response.message.content
           }
         } else if (interaction.commandName === "durdur") {
           this.isActive = false; 
@@ -86,7 +88,7 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         const newMessage = this.messageRepository.create({
           username: message.author.username,
           usercontent: message.content,
-          aicontent: "",
+          aicontent: aiContent,
           createdAt: new Date(),
         });
 
