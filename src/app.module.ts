@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { DiscordBotService } from './discord-bot/discord-bot.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './discord-bot/discord-bot.entity';
+import { MessageService } from './discord-bot/message/message.service';
 import * as dotenv from "dotenv"
 dotenv.config()
 
@@ -20,6 +21,6 @@ dotenv.config()
     }),
     TypeOrmModule.forFeature([Message]),
   ],
-  providers: [DiscordBotService],
+  providers: [DiscordBotService, MessageService],
 })
 export class AppModule {}

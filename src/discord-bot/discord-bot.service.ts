@@ -9,7 +9,6 @@ import ollama from 'ollama';
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
   private isActive: boolean = false;
-  private aiContent:[String];
 
   constructor(
     @InjectRepository(Message)
@@ -43,8 +42,6 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.application.commands.create(stop);
 
       this.client.on('messageCreate', async (message) => {
-      this.client.on("interactionCreate", async (interaction) => {
-
         if (message.author.id === this.client.user.id) {
           return;
         }
@@ -52,7 +49,18 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         if (message.content.toLowerCase() === 'selam') {
           return message.reply(`Aleyküm Selam ${message.author}`);
         }
-        
+
+        const newMessage = this.messageRepository.create({
+          username: message.author.username,
+          usercontent: message.content,
+          aicontent: "dsadsa",
+          createdAt: new Date(),
+        });
+
+        await this.messageRepository.save(newMessage);
+      });
+
+      this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
 
         if (interaction.commandName === "baslat") {
@@ -64,37 +72,25 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
               return response.author.id === interaction.user.id; 
             };
 
-            const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] });
-            if (!collected) {
+            try {
+              const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] });
+              const userMessage = collected.first();
+              
+              const response = await ollama.chat({
+                model: 'llama3.2',
+                messages: [{ role: 'user', content: userMessage.content }],
+              });
+
+              await interaction.channel.send(response.message.content);
+            } catch (error) {
               await interaction.channel.send("30 saniye içinde yanıt alamadım. Sohbeti durduruyorum.");
               this.isActive = false; 
-              return;
             }
-
-            const userMessage = collected.first();
-            const response = await ollama.chat({
-              model: 'llama3.2',
-              messages: [{ role: 'user', content: userMessage.content }],
-            });
-
-            await interaction.channel.send(response.message.content);
-            const aiContent = response.message.content
           }
         } else if (interaction.commandName === "durdur") {
           this.isActive = false; 
-            interaction.reply("Sohbet durduruldu.");
+          await interaction.reply("Sohbet durduruldu.");
         }
-
-        const newMessage = this.messageRepository.create({
-          username: message.author.username,
-          usercontent: message.content,
-          aicontent: aiContent,
-          createdAt: new Date(),
-        });
-
-        await this.messageRepository.save(newMessage);
-      });
-
       });
 
     } catch (error) {
