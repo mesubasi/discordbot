@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './discord-bot.entity'; 
 import ollama from 'ollama';
-import { channel } from 'diagnostics_channel';
 
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
@@ -45,15 +44,23 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
         if (interaction.commandName === "baslat") {
+        try {
           await interaction.reply("Sohbet başlatılıyor...");
           
           const response = await ollama.chat({
             model: 'llama3.2',
             messages: [{ role: 'user',content: "Merhaba! Ben bir yapay zeka destekli sohbet botuyum. Herhangi bir konuda seninle sohbet etmek, sorularını yanıtlamak veya bilgi sağlamak için buradayım. İstediğin konuyu seçebilirsin: genel bilgi, teknoloji, bilim, sanat, günlük yaşam veya başka bir şey. Ne hakkında konuşmak istersin?" }],
           });
-          await interaction.channel.send(response.message.content);        
+          await interaction.channel.send(response.message.content);
+        } catch (error) {
+          console.log(error);
+        }        
         } else if (interaction.commandName === "durdur"){
-
+          try {
+            await interaction.reply("Sohbet durduruldu.");
+          } catch (error) {
+            console.log(error);
+          }
         }
       });
 
