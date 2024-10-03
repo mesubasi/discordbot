@@ -10,6 +10,9 @@ export class Message {
 
   @Column()
   content: string;
+  
+  @Column()
+  aicontent: string;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
