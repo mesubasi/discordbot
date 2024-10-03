@@ -20,5 +20,6 @@ dotenv.config()
     }),
     TypeOrmModule.forFeature([Message]),
   ],
+  providers: [DiscordBotService],
 })
 export class AppModule {}
