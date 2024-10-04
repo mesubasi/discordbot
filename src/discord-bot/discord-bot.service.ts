@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { Client, GatewayIntentBits, SlashCommandBuilder } from 'discord.js';
+import { Client, GatewayIntentBits, SlashCommandBuilder, Message as DiscordMessage } from 'discord.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './discord-bot.entity'; 
@@ -41,58 +41,71 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
       await this.client.application.commands.create(start);
       await this.client.application.commands.create(stop);
 
-      this.client.on('messageCreate', async (message) => {
-        if (message.author.id === this.client.user.id) {
-          return;
-        }
-
-        if (message.content.toLowerCase() === 'selam') {
-          return message.reply(`Aleyküm Selam ${message.author}`);
-        }
-
-        const newMessage = this.messageRepository.create({
-          username: message.author.username,
-          usercontent: message.content,
-          aicontent: "dsadsa",
-          createdAt: new Date(),
-        });
-
-        await this.messageRepository.save(newMessage);
-      });
+      this.client.on('messageCreate', this.handleMessage.bind(this));
 
       this.client.on("interactionCreate", async (interaction) => {
         if (!interaction.isChatInputCommand()) return;
 
         if (interaction.commandName === "baslat") {
           this.isActive = true; 
-          await interaction.reply("Sohbet başlatılıyor...");
-
-          while (this.isActive) {
-            const filter = (response) => {
-              return response.author.id === interaction.user.id; 
-            };
-
-            try {
-              const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] });
-              const userMessage = collected.first();
-              
-              const response = await ollama.chat({
-                model: 'llama3.2',
-                messages: [{ role: 'user', content: userMessage.content }],
-              });
-
-              await interaction.channel.send(response.message.content);
-            } catch (error) {
-              await interaction.channel.send("30 saniye içinde yanıt alamadım. Sohbeti durduruyorum.");
-              this.isActive = false; 
-            }
-          }
+          await interaction.reply("Lütfen mesaj giriniz:");
         } else if (interaction.commandName === "durdur") {
           this.isActive = false; 
           await interaction.reply("Sohbet durduruldu.");
         }
       });
 
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  private async handleMessage(message: DiscordMessage) {
+    if (message.author.bot) return;
+
+    await this.saveMessageToDatabase(message.author.username, message.content, '');
+
+    if (message.content.toLowerCase() === 'selam') {
+      const reply = `Aleyküm Selam ${message.author}`;
+      await message.reply(reply);
+      await this.saveMessageToDatabase('Bot', reply, message.content);
+      return;
+    }
+
+    if (this.isActive) {
+      try {
+        const aiResponse = await this.AIResponse(message.content);
+        await message.reply(aiResponse);
+        await this.saveMessageToDatabase('Bot', aiResponse, message.content);
+      } catch (error) {
+        console.error('Error', error);
+        await message.reply("Üzgünüm, bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+      }
+    }
+  }
+
+  private async AIResponse(userMessage: string): Promise<string> {
+    try {
+      const response = await ollama.chat({
+        model: 'llama3.2',
+        messages: [{ role: 'user', content: userMessage }],
+      });
+      return response.message.content;
+    } catch (error) {
+      console.error('Error', error);
+      throw error; 
+    }
+  }
+
+  private async saveMessageToDatabase(username: string, content: string, aiPrompt: string) {
+    try {
+      const newMessage = this.messageRepository.create({
+        username,
+        content: content,
+        usercontent: aiPrompt,
+        createdAt: new Date(),
+      });
+      await this.messageRepository.save(newMessage);
     } catch (error) {
       console.error('Error', error);
     }

@@ -9,10 +9,10 @@ export class Message {
   username: string;
 
   @Column()
-  usercontent: string;
+  content: string;
 
   @Column()
-  aicontent: string;
+  usercontent: string;
 
   @Column({ type: 'timestamptz' })
   createdAt: Date;
