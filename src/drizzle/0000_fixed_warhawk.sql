@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "message" (
 	"username" varchar NOT NULL,
 	"content" varchar NOT NULL,
 	"usercontent" varchar NOT NULL,
-	"createdAt" timestamp with time zone NOT NULL
+	"timestamp" timestamp with time zone NOT NULL
 );
 
 */

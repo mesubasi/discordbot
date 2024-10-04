@@ -9,5 +9,5 @@ export const message = pgTable("message", {
 	username: varchar("username").notNull(),
 	content: varchar("content").notNull(),
 	usercontent: varchar("usercontent").notNull(),
-	createdAt: timestamp("createdAt", { withTimezone: true, mode: 'string' }).notNull(),
+	timestamp: timestamp("timestamp", { withTimezone: true, mode: 'string' }).notNull(),
 });

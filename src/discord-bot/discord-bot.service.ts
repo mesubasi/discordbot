@@ -2,10 +2,9 @@ import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Client, GatewayIntentBits, SlashCommandBuilder, Message as DiscordMessage } from 'discord.js';
 import { discordBotTable } from './discord-bot.entity'; 
 import ollama from 'ollama';
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as dotenv from 'dotenv';
-import { message } from 'src/drizzle/schema';
 
 dotenv.config();
 
@@ -110,9 +109,9 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
         username,
         content,
         usercontent: aiPrompt,
-        createdAt: new Date(),
+        timestamp: new Date(),
       };
-      await this.db.insert(discordBotTable).values(message);
+      await this.db.insert(discordBotTable).values(newMessage);
     } catch (error) {
       console.error('Error', error);
     }

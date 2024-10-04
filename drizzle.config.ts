@@ -1,4 +1,4 @@
-import 'dotenv/config'; 
+import 'dotenv/config'; // make sure to install dotenv package
 import { defineConfig } from 'drizzle-kit';
 
 export default defineConfig({
@@ -11,8 +11,10 @@ export default defineConfig({
     user: process.env.DB_USERNAME!,
     password: process.env.DB_PASSWORD!,
     database: process.env.DB_NAME!,
-    ssl:false
+    ssl: false,
   },
+  // Print all statements
   verbose: true,
+  // Always ask for confirmation
   strict: true,
 });

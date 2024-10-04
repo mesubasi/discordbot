@@ -1,19 +1,23 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { DiscordBotService } from './discord-bot/discord-bot.service';
-import { Pool } from 'pg';
+import { db } from './drizzle/db';
+import { resolve } from 'node:path';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import * as dotenv from 'dotenv';
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg'; 
 dotenv.config();
 
 @Module({
   providers: [DiscordBotService],
 })
-export class AppModule implements OnModuleInit{
-  private db:any;
-  async onModuleInit() {
-    const pool = new Pool({
-      connectionString: process.env.DB_URL
-    })
-    this.db = drizzle(pool)
+export class AppModule {
+  private pool: Pool;
+
+  constructor() {
+  
+    this.pool = new Pool({
+      connectionString: process.env.DATABASE_URL, 
+    });
   }
+
 }

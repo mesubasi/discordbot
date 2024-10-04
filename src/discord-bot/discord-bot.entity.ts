@@ -1,9 +1,9 @@
 import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
-export const discordBotTable = pgTable("discord_bot", {
+export const discordBotTable = pgTable("message", {
   id: serial("id").primaryKey(),
   username: text("username").notNull(),
   content: text("content").notNull(),
-  aicontent: text("aicontent").notNull(),
-  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
+  usercontent: text("usercontent").notNull(),
+  timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow(),
 });
