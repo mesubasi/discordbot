@@ -1,19 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
 
-@Entity()
-export class Message {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  username: string;
-
-  @Column()
-  content: string;
-
-  @Column()
-  usercontent: string;
-
-  @Column({ type: 'timestamptz' })
-  createdAt: Date;
-}
+export const discordBotTable = pgTable("discord_bot", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull(),
+  content: text("content").notNull(),
+  aicontent: text("aicontent").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).defaultNow(),
+});

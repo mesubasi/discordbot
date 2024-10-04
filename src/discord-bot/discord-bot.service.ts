@@ -1,19 +1,26 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { Client, GatewayIntentBits, SlashCommandBuilder, Message as DiscordMessage } from 'discord.js';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Message } from './discord-bot.entity'; 
+import { discordBotTable } from './discord-bot.entity'; 
 import ollama from 'ollama';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import { Pool } from 'pg';
+import * as dotenv from 'dotenv';
+import { message } from 'src/drizzle/schema';
+
+dotenv.config();
 
 @Injectable()
 export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
   private isActive: boolean = false;
+  private db: any; 
 
-  constructor(
-    @InjectRepository(Message)
-    private messageRepository: Repository<Message>,
-  ) {}
+  constructor() {
+    const pool = new Pool({
+      connectionString: process.env.DATABASE_URL, 
+    });
+    this.db = drizzle(pool);
+  }
 
   async onModuleInit() {
     try {
@@ -99,13 +106,13 @@ export class DiscordBotService implements OnModuleInit, OnModuleDestroy {
 
   private async saveMessageToDatabase(username: string, content: string, aiPrompt: string) {
     try {
-      const newMessage = this.messageRepository.create({
+      const newMessage = {
         username,
-        content: content,
+        content,
         usercontent: aiPrompt,
         createdAt: new Date(),
-      });
-      await this.messageRepository.save(newMessage);
+      };
+      await this.db.insert(discordBotTable).values(message);
     } catch (error) {
       console.error('Error', error);
     }
